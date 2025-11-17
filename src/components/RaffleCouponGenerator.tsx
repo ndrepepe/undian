@@ -360,7 +360,8 @@ const RaffleCouponGenerator: React.FC = () => {
                     >
                     Pilih Semua ({selectedIds.size} Karyawan Terpilih)
                     </label>
-                    <span className="text-sm w-20 text-right font-mono text-primary">{employee.totalCoupons}</span>
+                    {/* Menampilkan total kupon yang dipilih di header */}
+                    <span className="text-sm w-20 text-right font-mono text-primary">{totalSelectedCoupons}</span>
                 </div>
 
                 {/* Employee List */}
