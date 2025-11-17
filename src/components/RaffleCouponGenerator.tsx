@@ -27,7 +27,7 @@ const RaffleCouponGenerator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [couponsToRender, setCouponsToRender] = useState<Coupon[]>([]); // Kupon yang sedang di-render untuk PDF
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set()); // Perbaikan di sini
   const [searchTerm, setSearchTerm] = useState('');
   const couponContainerRef = useRef<HTMLDivElement>(null);
 
@@ -222,7 +222,7 @@ const RaffleCouponGenerator: React.FC = () => {
       
       // Hitung posisi kupon di halaman saat ini
       const indexOnPage = i % couponsPerPage;
-      const row = Math.floor(indexOnPage / couponsPerPage);
+      const row = Math.floor(indexOnPage / couponsPerRow); 
       const col = indexOnPage % couponsPerRow;
 
       // Posisi X dan Y dalam mm
@@ -360,7 +360,7 @@ const RaffleCouponGenerator: React.FC = () => {
                     >
                     Pilih Semua ({selectedIds.size} Karyawan Terpilih)
                     </label>
-                    <span className="text-sm font-medium w-20 text-right">Kupon</span>
+                    <span className="text-sm w-20 text-right font-mono text-primary">{employee.totalCoupons}</span>
                 </div>
 
                 {/* Employee List */}
