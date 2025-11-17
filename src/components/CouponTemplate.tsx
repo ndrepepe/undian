@@ -3,11 +3,11 @@ import React from 'react';
 interface CouponTemplateProps {
   name: string;
   employeeId: string;
-  // couponNumber: number; // Global raffle number - REMOVED
   employeeCouponSequence: number; // Sequence number specific to the employee
+  totalCouponsForEmployee: number; // Total coupons for this specific employee
 }
 
-const CouponTemplate: React.FC<CouponTemplateProps> = ({ name, employeeId, employeeCouponSequence }) => {
+const CouponTemplate: React.FC<CouponTemplateProps> = ({ name, employeeId, employeeCouponSequence, totalCouponsForEmployee }) => {
   // Ukuran kupon: 8cm x 5cm (landscape)
   
   return (
@@ -58,7 +58,7 @@ const CouponTemplate: React.FC<CouponTemplateProps> = ({ name, employeeId, emplo
         </div>
         <div className="text-right">
           {/* Menampilkan nomor urut kupon karyawan sebagai nomor utama */}
-          <p className="text-lg font-extrabold text-red-600">#{employeeCouponSequence}</p>
+          <p className="text-lg font-extrabold text-red-600">#{employeeCouponSequence}-{totalCouponsForEmployee}</p>
         </div>
       </div>
     </div>

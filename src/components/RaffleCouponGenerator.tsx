@@ -27,7 +27,7 @@ const RaffleCouponGenerator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [couponsToRender, setCouponsToRender] = useState<Coupon[]>([]); // Kupon yang sedang di-render untuk PDF
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set()); // Perbaikan di sini
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const couponContainerRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +50,13 @@ const RaffleCouponGenerator: React.FC = () => {
       totalCoupons: data.count,
     })).sort((a, b) => a.name.localeCompare(b.name));
   }, [coupons]);
+
+  // Peta untuk mencari total kupon per karyawan dengan cepat
+  const employeeTotalCouponsMap = useMemo(() => {
+    const map = new Map<string, number>();
+    employees.forEach(emp => map.set(emp.id, emp.totalCoupons));
+    return map;
+  }, [employees]);
 
   // 2. Filter karyawan berdasarkan pencarian
   const filteredEmployees = useMemo(() => {
@@ -360,8 +367,7 @@ const RaffleCouponGenerator: React.FC = () => {
                     >
                     Pilih Semua ({selectedIds.size} Karyawan Terpilih)
                     </label>
-                    {/* Menampilkan total kupon yang dipilih di header */}
-                    <span className="text-sm w-20 text-right font-mono text-primary">{totalSelectedCoupons}</span>
+                    <span className="text-sm w-20 text-right font-medium">Kupon</span>
                 </div>
 
                 {/* Employee List */}
@@ -401,6 +407,7 @@ const RaffleCouponGenerator: React.FC = () => {
                           name={coupons[0].name} 
                           employeeId={coupons[0].employeeId} 
                           employeeCouponSequence={coupons[0].employeeCouponSequence}
+                          totalCouponsForEmployee={employeeTotalCouponsMap.get(coupons[0].employeeId) || 0}
                       />
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">Total {coupons.length} kupon dari {employees.length} karyawan telah diproses.</p>
@@ -421,6 +428,7 @@ const RaffleCouponGenerator: React.FC = () => {
             name={coupon.name} 
             employeeId={coupon.employeeId} 
             employeeCouponSequence={coupon.employeeCouponSequence}
+            totalCouponsForEmployee={employeeTotalCouponsMap.get(coupon.employeeId) || 0}
           />
         ))}
       </div>
