@@ -59,13 +59,13 @@ const CouponTemplate: React.FC<CouponTemplateProps> = ({
       {/* Bagian tengah: Nama dan ID Karyawan (dipusatkan) */}
       <div className="flex flex-col items-center justify-center flex-grow relative z-10">
         <p className="font-medium text-sm">Nama: {name}</p>
-        <p className="text-[11px]">ID Karyawan: {employeeId}</p>
+        <p className="text-[11px]">ID: {employeeId}</p>
       </div>
 
       {/* Bagian bawah: Nomor Kupon Karyawan */}
       <div className="flex justify-between items-end mt-1 relative z-10">
         <div className="text-[8px] text-gray-500">
-          No Urut Kupon Karyawan: #{employeeCouponSequence}
+          No Urut Kupon: #{employeeCouponSequence}
         </div>
         <div className="text-right">
           {/* Menampilkan nomor urut kupon karyawan sebagai nomor utama */}
