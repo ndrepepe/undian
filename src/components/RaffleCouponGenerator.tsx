@@ -244,10 +244,10 @@ const RaffleCouponGenerator: React.FC = () => {
 
     setIsLoading(true);
 
-    // Filter kupon berdasarkan ID karyawan yang dipilih
+    // Filter kupon berdasarkan ID karyawan yang dipilih dan pastikan diurutkan berdasarkan ID
     const couponsToPrint = coupons.filter(coupon => 
         selectedEmployeeIds.includes(coupon.employeeId)
-    );
+    ).sort((a, b) => a.employeeId.localeCompare(b.employeeId));
 
     if (couponsToPrint.length === 0) {
         showError("Kupon yang dipilih tidak ditemukan.");
@@ -294,24 +294,39 @@ const RaffleCouponGenerator: React.FC = () => {
     }
 
     let pageCounter = 1;
+    let previousEmployeeId: string | null = null;
+    let currentCouponIndexOnPage = 0; // Tracks position on the current page (0 to couponsPerPage - 1)
+
 
     for (let i = 0; i < couponsToPrint.length; i++) {
       const couponEl = couponElements[i] as HTMLElement;
+      const currentCoupon = couponsToPrint[i];
       
-      // Hitung posisi kupon di halaman saat ini
-      const indexOnPage = i % couponsPerPage;
-      const row = Math.floor(indexOnPage / couponsPerRow); 
-      const col = indexOnPage % couponsPerRow;
+      let shouldAddPage = false;
+
+      // 1. Check for employee change (force page break)
+      if (previousEmployeeId !== null && currentCoupon.employeeId !== previousEmployeeId) {
+        shouldAddPage = true;
+      } 
+      
+      // 2. Check for page capacity limit (force page break)
+      if (!shouldAddPage && currentCouponIndexOnPage >= couponsPerPage) {
+        shouldAddPage = true;
+      }
+
+      if (shouldAddPage) {
+        doc.addPage();
+        pageCounter++;
+        currentCouponIndexOnPage = 0; // Reset index for the new page
+      }
+      
+      // Calculate position based on currentCouponIndexOnPage
+      const row = Math.floor(currentCouponIndexOnPage / couponsPerRow); 
+      const col = currentCouponIndexOnPage % couponsPerRow;
 
       // Posisi X dan Y dalam mm
       const x = MARGIN_MM + col * COUPON_WIDTH_MM;
       const y = MARGIN_MM + row * COUPON_HEIGHT_MM;
-
-      // Jika ini kupon pertama di halaman baru (kecuali halaman pertama)
-      if (i > 0 && indexOnPage === 0) {
-        doc.addPage();
-        pageCounter++;
-      }
 
       // Render kupon ke canvas
       const canvas = await html2canvas(couponEl, {
@@ -324,6 +339,10 @@ const RaffleCouponGenerator: React.FC = () => {
       
       // Tambahkan gambar kupon ke PDF
       doc.addImage(imgData, 'PNG', x, y, COUPON_WIDTH_MM, COUPON_HEIGHT_MM);
+      
+      // Update state for next iteration
+      previousEmployeeId = currentCoupon.employeeId;
+      currentCouponIndexOnPage++;
     }
 
     doc.save(`kupon_undian_${selectedEmployeeIds.length}_karyawan.pdf`);
