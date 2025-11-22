@@ -172,9 +172,10 @@ const RaffleCouponGenerator: React.FC = () => {
 
         json.forEach((row) => {
           const nama = row['nama'] || row['Nama'];
-          // Menerima berbagai variasi kolom ID Karyawan
+          // Menerima berbagai variasi kolom ID
           const idKaryawan = row['id karywan'] || row['ID Karyawan'] || row['idkarywan'] || row['ID']; 
-          const masaKerja = parseInt(row['masa kerja'] || row['Masa Kerja'] || row['masakerja'], 10);
+          // Menerima berbagai variasi kolom Masa Kerja/Jumlah Kupon
+          const masaKerja = parseInt(row['masa kerja'] || row['Masa Kerja'] || row['masakerja'] || row['jumlah kupon'] || row['Jumlah Kupon'], 10);
 
           if (nama && idKaryawan && !isNaN(masaKerja) && masaKerja > 0) {
             parsedData.push({
@@ -190,7 +191,7 @@ const RaffleCouponGenerator: React.FC = () => {
         
       } catch (error) {
         console.error(error);
-        showError("Gagal memproses file. Pastikan format kolom adalah 'nama', 'id karywan' (atau 'ID'), dan 'masa kerja'.");
+        showError("Gagal memproses file. Pastikan format kolom adalah 'nama', 'ID', dan 'jumlah kupon' (atau 'masa kerja').");
       } finally {
         setIsLoading(false);
       }
@@ -363,12 +364,12 @@ const RaffleCouponGenerator: React.FC = () => {
 
   const handleDownloadTemplate = () => {
     const templateData = [
-        { 'nama': 'Contoh Nama Karyawan', 'ID': '12345', 'masa kerja': 5 },
-        { 'nama': 'Nama Karyawan Lain', 'ID': '67890', 'masa kerja': 2 },
+        { 'nama': 'Contoh Nama Karyawan', 'ID': '12345', 'Jumlah Kupon': 5 },
+        { 'nama': 'Nama Karyawan Lain', 'ID': '67890', 'Jumlah Kupon': 2 },
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(templateData, { 
-        header: ['nama', 'ID', 'masa kerja'] 
+        header: ['nama', 'ID', 'Jumlah Kupon'] 
     });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
@@ -441,8 +442,8 @@ const RaffleCouponGenerator: React.FC = () => {
                     <p className="text-sm text-muted-foreground">
                         Unggah file Excel (.xlsx) yang berisi kolom: 
                         <code className="font-mono text-primary">nama</code>, 
-                        <code className="font-mono text-primary">id karywan</code> (atau <code className="font-mono text-primary">ID</code>), dan 
-                        <code className="font-mono text-primary">masa kerja</code> (dalam tahun).
+                        <code className="font-mono text-primary">ID</code>, dan 
+                        <code className="font-mono text-primary">Jumlah Kupon</code>.
                     </p>
                     <Button 
                         variant="outline" 
