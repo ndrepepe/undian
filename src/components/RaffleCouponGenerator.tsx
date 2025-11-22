@@ -172,7 +172,8 @@ const RaffleCouponGenerator: React.FC = () => {
 
         json.forEach((row) => {
           const nama = row['nama'] || row['Nama'];
-          const idKaryawan = row['id karywan'] || row['ID Karyawan'] || row['idkarywan'];
+          // Menerima berbagai variasi kolom ID Karyawan
+          const idKaryawan = row['id karywan'] || row['ID Karyawan'] || row['idkarywan'] || row['ID']; 
           const masaKerja = parseInt(row['masa kerja'] || row['Masa Kerja'] || row['masakerja'], 10);
 
           if (nama && idKaryawan && !isNaN(masaKerja) && masaKerja > 0) {
@@ -189,7 +190,7 @@ const RaffleCouponGenerator: React.FC = () => {
         
       } catch (error) {
         console.error(error);
-        showError("Gagal memproses file. Pastikan format kolom adalah 'nama', 'id karywan', dan 'masa kerja'.");
+        showError("Gagal memproses file. Pastikan format kolom adalah 'nama', 'id karywan' (atau 'ID'), dan 'masa kerja'.");
       } finally {
         setIsLoading(false);
       }
@@ -203,7 +204,7 @@ const RaffleCouponGenerator: React.FC = () => {
     const isDuplicate = combinedEmployees.some(emp => emp.employeeId === employeeId);
     
     if (isDuplicate) {
-      showError(`ID Karyawan ${employeeId} sudah ada. Harap gunakan ID unik.`);
+      showError(`ID ${employeeId} sudah ada. Harap gunakan ID unik.`);
       return;
     }
 
@@ -362,12 +363,12 @@ const RaffleCouponGenerator: React.FC = () => {
 
   const handleDownloadTemplate = () => {
     const templateData = [
-        { 'nama': 'Contoh Nama Karyawan', 'id karywan': '12345', 'masa kerja': 5 },
-        { 'nama': 'Nama Karyawan Lain', 'id karywan': '67890', 'masa kerja': 2 },
+        { 'nama': 'Contoh Nama Karyawan', 'ID': '12345', 'masa kerja': 5 },
+        { 'nama': 'Nama Karyawan Lain', 'ID': '67890', 'masa kerja': 2 },
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(templateData, { 
-        header: ['nama', 'id karywan', 'masa kerja'] 
+        header: ['nama', 'ID', 'masa kerja'] 
     });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
@@ -440,7 +441,7 @@ const RaffleCouponGenerator: React.FC = () => {
                     <p className="text-sm text-muted-foreground">
                         Unggah file Excel (.xlsx) yang berisi kolom: 
                         <code className="font-mono text-primary">nama</code>, 
-                        <code className="font-mono text-primary">id karywan</code>, dan 
+                        <code className="font-mono text-primary">id karywan</code> (atau <code className="font-mono text-primary">ID</code>), dan 
                         <code className="font-mono text-primary">masa kerja</code> (dalam tahun).
                     </p>
                     <Button 
