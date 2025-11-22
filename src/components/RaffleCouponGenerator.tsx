@@ -48,7 +48,7 @@ const RaffleCouponGenerator: React.FC = () => {
   const [eventName, setEventName] = useState('');
   const [eventLocation, setEventLocation] = useState('');
   const [eventDate, setEventDate] = useState('');
-  const [customWatermarkText, setCustomWatermarkText] = useState('ANDI OFFSET'); // Default Watermark
+  const [customWatermarkText, setCustomWatermarkText] = useState(''); // Default Watermark diubah menjadi string kosong
 
   const couponContainerRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +61,8 @@ const RaffleCouponGenerator: React.FC = () => {
         setEventName(details.eventName || '');
         setEventLocation(details.eventLocation || '');
         setEventDate(details.eventDate || '');
-        setCustomWatermarkText(details.customWatermarkText || 'ANDI OFFSET');
+        // Memastikan default adalah string kosong jika tidak ada di localStorage
+        setCustomWatermarkText(details.customWatermarkText || ''); 
       }
     } catch (error) {
       console.error("Gagal memuat detail acara dari localStorage:", error);
