@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Download, Search, FileText, FileSpreadsheet, PlusCircle } from 'lucide-react';
+import { Loader2, Download, Search, FileText, FileSpreadsheet, PlusCircle, Trash2 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import CouponTemplate from './CouponTemplate';
 import ManualInputForm from './ManualInputForm';
@@ -207,6 +207,32 @@ const RaffleCouponGenerator: React.FC = () => {
     showSuccess(`Karyawan ${name} berhasil ditambahkan.`);
   };
 
+  const handleDeleteSelected = useCallback(() => {
+    if (selectedIds.size === 0) {
+      showError("Pilih setidaknya satu karyawan untuk dihapus.");
+      return;
+    }
+
+    const idsToDelete = Array.from(selectedIds);
+    
+    // Filter Excel Data
+    const newExcelData = excelData.filter(emp => !idsToDelete.includes(emp.employeeId));
+    
+    // Filter Manual Data
+    const newManualData = manualData.filter(emp => !idsToDelete.includes(emp.employeeId));
+
+    const deletedCount = (excelData.length - newExcelData.length) + (manualData.length - newManualData.length);
+
+    if (deletedCount > 0) {
+      setExcelData(newExcelData);
+      setManualData(newManualData);
+      setSelectedIds(new Set()); // Clear selection after deletion
+      showSuccess(`${deletedCount} karyawan berhasil dihapus.`);
+    } else {
+      showError("Tidak ada karyawan yang cocok dengan pilihan untuk dihapus.");
+    }
+  }, [selectedIds, excelData, manualData]);
+
 
   const handleGeneratePDF = async () => {
     const selectedEmployeeIds = Array.from(selectedIds);
@@ -397,7 +423,18 @@ const RaffleCouponGenerator: React.FC = () => {
           {/* Bagian Pemilihan Karyawan (Inline) */}
           {employees.length > 0 && (
             <div className="space-y-4 p-4 border rounded-lg bg-card">
-                <h3 className="font-bold text-lg">Pilih Karyawan ({employees.length} Total)</h3>
+                <div className="flex justify-between items-center">
+                    <h3 className="font-bold text-lg">Pilih Karyawan ({employees.length} Total)</h3>
+                    <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={handleDeleteSelected}
+                        disabled={selectedIds.size === 0}
+                    >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Hapus ({selectedIds.size})
+                    </Button>
+                </div>
                 
                 {/* Search Input */}
                 <div className="relative">
