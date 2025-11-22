@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { Loader2, Download, Search, FileText, FileSpreadsheet, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2, Download, Search, FileText, FileSpreadsheet, PlusCircle, Trash2, Save } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import CouponTemplate from './CouponTemplate';
 import ManualInputForm from './ManualInputForm';
@@ -32,6 +32,9 @@ interface Employee {
   totalCoupons: number;
 }
 
+// Kunci untuk localStorage
+const EVENT_DETAILS_KEY = 'raffle_event_details';
+
 const RaffleCouponGenerator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [excelData, setExcelData] = useState<EmployeeData[]>([]);
@@ -41,12 +44,39 @@ const RaffleCouponGenerator: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   
-  // State baru untuk detail acara
-  const [eventName, setEventName] = useState(''); // Dikosongkan
-  const [eventLocation, setEventLocation] = useState(''); // Dikosongkan
-  const [eventDate, setEventDate] = useState(''); // Dikosongkan
+  // State untuk detail acara
+  const [eventName, setEventName] = useState('');
+  const [eventLocation, setEventLocation] = useState('');
+  const [eventDate, setEventDate] = useState('');
 
   const couponContainerRef = useRef<HTMLDivElement>(null);
+
+  // Efek untuk memuat detail acara dari localStorage saat inisialisasi
+  useEffect(() => {
+    try {
+      const savedDetails = localStorage.getItem(EVENT_DETAILS_KEY);
+      if (savedDetails) {
+        const details = JSON.parse(savedDetails);
+        setEventName(details.eventName || '');
+        setEventLocation(details.eventLocation || '');
+        setEventDate(details.eventDate || '');
+      }
+    } catch (error) {
+      console.error("Gagal memuat detail acara dari localStorage:", error);
+    }
+  }, []);
+
+  // Fungsi untuk menyimpan detail acara ke localStorage
+  const handleSaveEventDetails = () => {
+    try {
+      const details = { eventName, eventLocation, eventDate };
+      localStorage.setItem(EVENT_DETAILS_KEY, JSON.stringify(details));
+      showSuccess("Detail acara berhasil disimpan!");
+    } catch (error) {
+      showError("Gagal menyimpan detail acara.");
+      console.error("Gagal menyimpan detail acara ke localStorage:", error);
+    }
+  };
 
   // Gabungkan data dari Excel dan Manual, lalu proses menjadi kupon
   useEffect(() => {
@@ -395,7 +425,18 @@ const RaffleCouponGenerator: React.FC = () => {
           
           {/* Input Detail Acara */}
           <div className="space-y-4 p-4 border rounded-lg bg-secondary/50">
-            <h3 className="font-bold text-lg">Detail Acara</h3>
+            <div className="flex justify-between items-center mb-2">
+                <h3 className="font-bold text-lg">Detail Acara</h3>
+                <Button 
+                    onClick={handleSaveEventDetails} 
+                    size="sm" 
+                    variant="outline"
+                    disabled={!eventName && !eventLocation && !eventDate}
+                >
+                    <Save className="mr-2 h-4 w-4" />
+                    Simpan
+                </Button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="event-name">Nama Acara</Label>
@@ -403,7 +444,7 @@ const RaffleCouponGenerator: React.FC = () => {
                   id="event-name"
                   value={eventName}
                   onChange={(e) => setEventName(e.target.value)}
-                  placeholder="Nama Acara" // Placeholder ditambahkan
+                  placeholder="Nama Acara"
                 />
               </div>
               <div>
@@ -412,7 +453,7 @@ const RaffleCouponGenerator: React.FC = () => {
                   id="event-location"
                   value={eventLocation}
                   onChange={(e) => setEventLocation(e.target.value)}
-                  placeholder="Tempat Acara" // Placeholder ditambahkan
+                  placeholder="Tempat Acara"
                 />
               </div>
               <div>
@@ -421,7 +462,7 @@ const RaffleCouponGenerator: React.FC = () => {
                   id="event-date"
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  placeholder="Tanggal Acara" // Placeholder ditambahkan
+                  placeholder="Tanggal Acara"
                 />
               </div>
             </div>
