@@ -5,9 +5,20 @@ interface CouponTemplateProps {
   employeeId: string;
   employeeCouponSequence: number; // Sequence number specific to the employee
   totalCouponsForEmployee: number; // Total coupons for this specific employee
+  eventName: string;
+  eventLocation: string;
+  eventDate: string;
 }
 
-const CouponTemplate: React.FC<CouponTemplateProps> = ({ name, employeeId, employeeCouponSequence, totalCouponsForEmployee }) => {
+const CouponTemplate: React.FC<CouponTemplateProps> = ({ 
+  name, 
+  employeeId, 
+  employeeCouponSequence, 
+  totalCouponsForEmployee,
+  eventName,
+  eventLocation,
+  eventDate
+}) => {
   // Ukuran kupon: 8cm x 5cm (landscape)
   
   return (
@@ -39,9 +50,9 @@ const CouponTemplate: React.FC<CouponTemplateProps> = ({ name, employeeId, emplo
       </div>
 
       <div className="text-center relative z-10">
-        <h3 className="font-bold text-sm leading-tight">Gathering Keluarga Andi Offset</h3>
-        <h3 className="font-bold text-sm leading-tight">Gembira Loka Zoo</h3>
-        <h3 className="font-bold text-sm leading-tight mb-1">22 November 2025</h3>
+        <h3 className="font-bold text-sm leading-tight">{eventName}</h3>
+        <h3 className="font-bold text-sm leading-tight">{eventLocation}</h3>
+        <h3 className="font-bold text-sm leading-tight mb-1">{eventDate}</h3>
         <p className="text-[10px] text-gray-600 mb-2">Kupon Undian Berhadiah</p>
       </div>
       

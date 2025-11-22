@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
 import { Loader2, Download, Search, FileText, FileSpreadsheet, PlusCircle, Trash2 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import CouponTemplate from './CouponTemplate';
@@ -39,6 +40,12 @@ const RaffleCouponGenerator: React.FC = () => {
   const [couponsToRender, setCouponsToRender] = useState<Coupon[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // State baru untuk detail acara
+  const [eventName, setEventName] = useState('Gathering Keluarga Andi Offset');
+  const [eventLocation, setEventLocation] = useState('Gembira Loka Zoo');
+  const [eventDate, setEventDate] = useState('22 November 2025');
+
   const couponContainerRef = useRef<HTMLDivElement>(null);
 
   // Gabungkan data dari Excel dan Manual, lalu proses menjadi kupon
@@ -384,6 +391,40 @@ const RaffleCouponGenerator: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           
+          {/* Input Detail Acara */}
+          <div className="space-y-4 p-4 border rounded-lg bg-secondary/50">
+            <h3 className="font-bold text-lg">Detail Acara</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="event-name">Nama Acara</Label>
+                <Input
+                  id="event-name"
+                  value={eventName}
+                  onChange={(e) => setEventName(e.target.value)}
+                  placeholder="Contoh: Gathering Keluarga Andi Offset"
+                />
+              </div>
+              <div>
+                <Label htmlFor="event-location">Tempat Acara</Label>
+                <Input
+                  id="event-location"
+                  value={eventLocation}
+                  onChange={(e) => setEventLocation(e.target.value)}
+                  placeholder="Contoh: Gembira Loka Zoo"
+                />
+              </div>
+              <div>
+                <Label htmlFor="event-date">Tanggal Acara</Label>
+                <Input
+                  id="event-date"
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  placeholder="Contoh: 22 November 2025"
+                />
+              </div>
+            </div>
+          </div>
+
           <Tabs defaultValue="excel" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="excel">
@@ -524,6 +565,9 @@ const RaffleCouponGenerator: React.FC = () => {
                           employeeId={coupons[0].employeeId} 
                           employeeCouponSequence={coupons[0].employeeCouponSequence}
                           totalCouponsForEmployee={employeeTotalCouponsMap.get(coupons[0].employeeId) || 0}
+                          eventName={eventName}
+                          eventLocation={eventLocation}
+                          eventDate={eventDate}
                       />
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">Total {coupons.length} kupon dari {employees.length} karyawan telah diproses.</p>
@@ -545,6 +589,9 @@ const RaffleCouponGenerator: React.FC = () => {
             employeeId={coupon.employeeId} 
             employeeCouponSequence={coupon.employeeCouponSequence}
             totalCouponsForEmployee={employeeTotalCouponsMap.get(coupon.employeeId) || 0}
+            eventName={eventName}
+            eventLocation={eventLocation}
+            eventDate={eventDate}
           />
         ))}
       </div>
