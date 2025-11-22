@@ -8,6 +8,7 @@ interface CouponTemplateProps {
   eventName: string;
   eventLocation: string;
   eventDate: string;
+  watermarkText: string; // Prop baru untuk teks watermark
 }
 
 const CouponTemplate: React.FC<CouponTemplateProps> = ({ 
@@ -17,37 +18,47 @@ const CouponTemplate: React.FC<CouponTemplateProps> = ({
   totalCouponsForEmployee,
   eventName,
   eventLocation,
-  eventDate
+  eventDate,
+  watermarkText
 }) => {
   // Ukuran kupon: 8cm x 5cm (landscape)
   
+  // Fungsi untuk mengulang teks watermark agar memenuhi area kupon
+  const generateWatermarkLines = (text: string, repeatCount: number) => {
+    if (!text) return null;
+    const repeatedText = Array(repeatCount).fill(text).join(' ');
+    return Array(5).fill(repeatedText).map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < 4 && <br/>}
+      </React.Fragment>
+    ));
+  };
+
   return (
     <div 
       className="bg-white border border-dashed border-gray-400 p-2 shadow-sm flex flex-col justify-between text-xs relative overflow-hidden"
       style={{ width: '8cm', height: '5cm', boxSizing: 'border-box' }}
     >
       {/* Watermark */}
-      <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-      >
-        <span 
-          className="text-gray-200 dark:text-gray-700 font-extrabold whitespace-nowrap font-handwriting"
-          style={{
-            fontSize: '40px', // Ukuran font besar agar memenuhi kupon
-            opacity: 0.5, // Semi-transparan
-            transform: 'rotate(-27deg)', // Rotasi 27 derajat (negatif agar miring dari kiri atas ke kanan bawah)
-            // Mengulang teks untuk memenuhi area kupon
-            lineHeight: '1.2',
-            userSelect: 'none',
-          }}
+      {watermarkText && (
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
         >
-          ANDI OFFSET ANDI OFFSET ANDI OFFSET<br/>
-          ANDI OFFSET ANDI OFFSET ANDI OFFSET<br/>
-          ANDI OFFSET ANDI OFFSET ANDI OFFSET<br/>
-          ANDI OFFSET ANDI OFFSET ANDI OFFSET<br/>
-          ANDI OFFSET ANDI OFFSET ANDI OFFSET
-        </span>
-      </div>
+          <span 
+            className="text-gray-200 dark:text-gray-700 font-extrabold whitespace-nowrap font-handwriting"
+            style={{
+              fontSize: '40px', // Ukuran font besar agar memenuhi kupon
+              opacity: 0.5, // Semi-transparan
+              transform: 'rotate(-27deg)', // Rotasi 27 derajat (negatif agar miring dari kiri atas ke kanan bawah)
+              lineHeight: '1.2',
+              userSelect: 'none',
+            }}
+          >
+            {generateWatermarkLines(watermarkText.toUpperCase(), 3)}
+          </span>
+        </div>
+      )}
 
       <div className="text-center relative z-10">
         <h3 className="font-bold text-sm leading-tight">{eventName}</h3>

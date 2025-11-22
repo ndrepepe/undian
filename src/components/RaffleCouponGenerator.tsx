@@ -48,6 +48,7 @@ const RaffleCouponGenerator: React.FC = () => {
   const [eventName, setEventName] = useState('');
   const [eventLocation, setEventLocation] = useState('');
   const [eventDate, setEventDate] = useState('');
+  const [customWatermarkText, setCustomWatermarkText] = useState('ANDI OFFSET'); // Default Watermark
 
   const couponContainerRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +61,7 @@ const RaffleCouponGenerator: React.FC = () => {
         setEventName(details.eventName || '');
         setEventLocation(details.eventLocation || '');
         setEventDate(details.eventDate || '');
+        setCustomWatermarkText(details.customWatermarkText || 'ANDI OFFSET');
       }
     } catch (error) {
       console.error("Gagal memuat detail acara dari localStorage:", error);
@@ -69,7 +71,7 @@ const RaffleCouponGenerator: React.FC = () => {
   // Fungsi untuk menyimpan detail acara ke localStorage
   const handleSaveEventDetails = () => {
     try {
-      const details = { eventName, eventLocation, eventDate };
+      const details = { eventName, eventLocation, eventDate, customWatermarkText };
       localStorage.setItem(EVENT_DETAILS_KEY, JSON.stringify(details));
       showSuccess("Detail acara berhasil disimpan!");
     } catch (error) {
@@ -431,13 +433,13 @@ const RaffleCouponGenerator: React.FC = () => {
                     onClick={handleSaveEventDetails} 
                     size="sm" 
                     variant="outline"
-                    disabled={!eventName && !eventLocation && !eventDate}
+                    disabled={!eventName && !eventLocation && !eventDate && !customWatermarkText}
                 >
                     <Save className="mr-2 h-4 w-4" />
                     Simpan
                 </Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
                 <Label htmlFor="event-name">Nama Acara</Label>
                 <Input
@@ -465,6 +467,17 @@ const RaffleCouponGenerator: React.FC = () => {
                   placeholder="Tanggal Acara"
                 />
               </div>
+            </div>
+            
+            {/* Input Watermark Kustom */}
+            <div>
+                <Label htmlFor="custom-watermark">Teks Watermark Kupon</Label>
+                <Input
+                  id="custom-watermark"
+                  value={customWatermarkText}
+                  onChange={(e) => setCustomWatermarkText(e.target.value)}
+                  placeholder="Contoh: ANDI OFFSET"
+                />
             </div>
           </div>
 
@@ -611,6 +624,7 @@ const RaffleCouponGenerator: React.FC = () => {
                           eventName={eventName}
                           eventLocation={eventLocation}
                           eventDate={eventDate}
+                          watermarkText={customWatermarkText}
                       />
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">Total {coupons.length} kupon dari {employees.length} karyawan telah diproses.</p>
@@ -635,6 +649,7 @@ const RaffleCouponGenerator: React.FC = () => {
             eventName={eventName}
             eventLocation={eventLocation}
             eventDate={eventDate}
+            watermarkText={customWatermarkText}
           />
         ))}
       </div>
