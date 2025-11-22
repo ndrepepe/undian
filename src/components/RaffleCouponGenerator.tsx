@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Download, Search, FileText, FileSpreadsheet } from 'lucide-react';
+import { Loader2, Download, Search, FileText, FileSpreadsheet, PlusCircle } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import CouponTemplate from './CouponTemplate';
 import ManualInputForm from './ManualInputForm';
@@ -192,7 +192,9 @@ const RaffleCouponGenerator: React.FC = () => {
 
   const handleAddManualEmployee = (name: string, employeeId: string, masaKerja: number) => {
     // Cek duplikasi ID
-    const isDuplicate = employees.some(emp => emp.id === employeeId);
+    const combinedEmployees = [...excelData, ...manualData];
+    const isDuplicate = combinedEmployees.some(emp => emp.employeeId === employeeId);
+    
     if (isDuplicate) {
       showError(`ID Karyawan ${employeeId} sudah ada. Harap gunakan ID unik.`);
       return;
