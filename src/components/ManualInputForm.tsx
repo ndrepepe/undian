@@ -20,7 +20,7 @@ const ManualInputForm: React.FC<ManualInputFormProps> = ({ onAddEmployee }) => {
     const parsedMasaKerja = parseInt(masaKerja, 10);
 
     if (!name || !employeeId || isNaN(parsedMasaKerja) || parsedMasaKerja <= 0) {
-      showError('Harap isi Nama, ID, dan Masa Kerja (harus angka positif).');
+      showError('Harap isi Nama, ID, dan Jumlah Kupon (harus angka positif).');
       return;
     }
 
@@ -55,11 +55,11 @@ const ManualInputForm: React.FC<ManualInputFormProps> = ({ onAddEmployee }) => {
           />
         </div>
         <div>
-          <Label htmlFor="manual-masa-kerja">Masa Kerja (Tahun)</Label>
+          <Label htmlFor="manual-masa-kerja">Jumlah Kupon</Label>
           <Input
             id="manual-masa-kerja"
             type="number"
-            placeholder="Masa Kerja"
+            placeholder="Jumlah Kupon"
             min="1"
             value={masaKerja}
             onChange={(e) => setMasaKerja(e.target.value)}
