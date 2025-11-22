@@ -433,6 +433,7 @@ const RaffleCouponGenerator: React.FC = () => {
                     onClick={handleSaveEventDetails} 
                     size="sm" 
                     variant="outline"
+                    // Memastikan tombol aktif jika salah satu input detail acara atau watermark terisi
                     disabled={!eventName && !eventLocation && !eventDate && !customWatermarkText}
                 >
                     <Save className="mr-2 h-4 w-4" />
