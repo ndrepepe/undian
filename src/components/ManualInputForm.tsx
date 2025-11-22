@@ -40,7 +40,7 @@ const ManualInputForm: React.FC<ManualInputFormProps> = ({ onAddEmployee }) => {
           <Label htmlFor="manual-name">Nama</Label>
           <Input
             id="manual-name"
-            placeholder="Nama Karyawan"
+            placeholder="Nama"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -49,7 +49,7 @@ const ManualInputForm: React.FC<ManualInputFormProps> = ({ onAddEmployee }) => {
           <Label htmlFor="manual-id">ID</Label>
           <Input
             id="manual-id"
-            placeholder="ID Karyawan"
+            placeholder="ID"
             value={employeeId}
             onChange={(e) => setEmployeeId(e.target.value)}
           />
