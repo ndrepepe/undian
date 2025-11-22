@@ -42,9 +42,9 @@ const RaffleCouponGenerator: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   // State baru untuk detail acara
-  const [eventName, setEventName] = useState('Gathering Keluarga Andi Offset');
-  const [eventLocation, setEventLocation] = useState('Gembira Loka Zoo');
-  const [eventDate, setEventDate] = useState('22 November 2025');
+  const [eventName, setEventName] = useState(''); // Dikosongkan
+  const [eventLocation, setEventLocation] = useState(''); // Dikosongkan
+  const [eventDate, setEventDate] = useState(''); // Dikosongkan
 
   const couponContainerRef = useRef<HTMLDivElement>(null);
 
@@ -403,7 +403,7 @@ const RaffleCouponGenerator: React.FC = () => {
                   id="event-name"
                   value={eventName}
                   onChange={(e) => setEventName(e.target.value)}
-                  placeholder="Contoh: Gathering Keluarga Andi Offset"
+                  placeholder="Nama Acara" // Placeholder ditambahkan
                 />
               </div>
               <div>
@@ -412,7 +412,7 @@ const RaffleCouponGenerator: React.FC = () => {
                   id="event-location"
                   value={eventLocation}
                   onChange={(e) => setEventLocation(e.target.value)}
-                  placeholder="Contoh: Gembira Loka Zoo"
+                  placeholder="Tempat Acara" // Placeholder ditambahkan
                 />
               </div>
               <div>
@@ -421,7 +421,7 @@ const RaffleCouponGenerator: React.FC = () => {
                   id="event-date"
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  placeholder="Contoh: 22 November 2025"
+                  placeholder="Tanggal Acara" // Placeholder ditambahkan
                 />
               </div>
             </div>
