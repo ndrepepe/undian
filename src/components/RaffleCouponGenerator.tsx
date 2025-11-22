@@ -7,14 +7,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Download, Search, FileText } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, Download, Search, FileText, FileSpreadsheet } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import CouponTemplate from './CouponTemplate';
+import ManualInputForm from './ManualInputForm';
 
 interface Coupon {
   name: string;
   employeeId: string;
   employeeCouponSequence: number; // Sequence number specific to the employee
+}
+
+interface EmployeeData {
+  name: string;
+  employeeId: string;
+  masaKerja: number;
 }
 
 interface Employee {
@@ -25,11 +33,31 @@ interface Employee {
 
 const RaffleCouponGenerator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [excelData, setExcelData] = useState<EmployeeData[]>([]);
+  const [manualData, setManualData] = useState<EmployeeData[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [couponsToRender, setCouponsToRender] = useState<Coupon[]>([]); // Kupon yang sedang di-render untuk PDF
+  const [couponsToRender, setCouponsToRender] = useState<Coupon[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const couponContainerRef = useRef<HTMLDivElement>(null);
+
+  // Gabungkan data dari Excel dan Manual, lalu proses menjadi kupon
+  useEffect(() => {
+    const combinedData = [...excelData, ...manualData];
+    const processedCoupons: Coupon[] = [];
+
+    combinedData.forEach((data) => {
+      for (let i = 0; i < data.masaKerja; i++) {
+        processedCoupons.push({
+          name: data.name,
+          employeeId: data.employeeId,
+          employeeCouponSequence: i + 1,
+        });
+      }
+    });
+    setCoupons(processedCoupons);
+  }, [excelData, manualData]);
+
 
   // 1. Proses kupon menjadi daftar karyawan unik
   const employees: Employee[] = useMemo(() => {
@@ -68,7 +96,7 @@ const RaffleCouponGenerator: React.FC = () => {
     );
   }, [employees, searchTerm]);
 
-  // 3. Sinkronisasi: Pilih semua karyawan secara default setelah unggah file
+  // 3. Sinkronisasi: Pilih semua karyawan secara default setelah data berubah
   useEffect(() => {
     if (employees.length > 0) {
       setSelectedIds(new Set(employees.map(emp => emp.id)));
@@ -118,7 +146,8 @@ const RaffleCouponGenerator: React.FC = () => {
     if (!file) return;
 
     setIsLoading(true);
-    setCoupons([]);
+    setExcelData([]);
+    setManualData([]); // Clear manual data when uploading new Excel
     setCouponsToRender([]);
     setSelectedIds(new Set());
     setSearchTerm('');
@@ -132,7 +161,7 @@ const RaffleCouponGenerator: React.FC = () => {
         const worksheet = workbook.Sheets[sheetName];
         const json: any[] = XLSX.utils.sheet_to_json(worksheet);
 
-        const processedCoupons: Coupon[] = [];
+        const parsedData: EmployeeData[] = [];
 
         json.forEach((row) => {
           const nama = row['nama'] || row['Nama'];
@@ -140,18 +169,16 @@ const RaffleCouponGenerator: React.FC = () => {
           const masaKerja = parseInt(row['masa kerja'] || row['Masa Kerja'] || row['masakerja'], 10);
 
           if (nama && idKaryawan && !isNaN(masaKerja) && masaKerja > 0) {
-            for (let i = 0; i < masaKerja; i++) {
-              processedCoupons.push({
-                name: String(nama),
-                employeeId: String(idKaryawan),
-                employeeCouponSequence: i + 1, // Sequence number starts from 1 for each employee
-              });
-            }
+            parsedData.push({
+              name: String(nama),
+              employeeId: String(idKaryawan),
+              masaKerja: masaKerja,
+            });
           }
         });
 
-        setCoupons(processedCoupons);
-        showSuccess(`Berhasil memproses ${processedCoupons.length} kupon.`);
+        setExcelData(parsedData);
+        showSuccess(`Berhasil memproses ${parsedData.length} karyawan dari Excel.`);
         
       } catch (error) {
         console.error(error);
@@ -162,6 +189,22 @@ const RaffleCouponGenerator: React.FC = () => {
     };
     reader.readAsArrayBuffer(file);
   };
+
+  const handleAddManualEmployee = (name: string, employeeId: string, masaKerja: number) => {
+    // Cek duplikasi ID
+    const isDuplicate = employees.some(emp => emp.id === employeeId);
+    if (isDuplicate) {
+      showError(`ID Karyawan ${employeeId} sudah ada. Harap gunakan ID unik.`);
+      return;
+    }
+
+    setManualData(prev => [
+      ...prev,
+      { name, employeeId, masaKerja }
+    ]);
+    showSuccess(`Karyawan ${name} berhasil ditambahkan.`);
+  };
+
 
   const handleGeneratePDF = async () => {
     const selectedEmployeeIds = Array.from(selectedIds);
@@ -294,45 +337,60 @@ const RaffleCouponGenerator: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
-                Unggah file Excel (.xlsx) yang berisi kolom: 
-                <code className="font-mono text-primary">nama</code>, 
-                <code className="font-mono text-primary">id karywan</code>, dan 
-                <code className="font-mono text-primary">masa kerja</code> (dalam tahun).
-            </p>
-            <Button 
-                variant="outline" 
-                onClick={handleDownloadTemplate} 
-                className="shrink-0 w-full sm:w-auto"
-            >
-                <FileText className="mr-2 h-4 w-4" />
-                Unduh Template
-            </Button>
-          </div>
+          <Tabs defaultValue="excel" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="excel">
+                <FileSpreadsheet className="mr-2 h-4 w-4" /> Unggah Excel
+              </TabsTrigger>
+              <TabsTrigger value="manual">
+                <PlusCircle className="mr-2 h-4 w-4" /> Input Manual
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="excel" className="mt-4 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <p className="text-sm text-muted-foreground">
+                        Unggah file Excel (.xlsx) yang berisi kolom: 
+                        <code className="font-mono text-primary">nama</code>, 
+                        <code className="font-mono text-primary">id karywan</code>, dan 
+                        <code className="font-mono text-primary">masa kerja</code> (dalam tahun).
+                    </p>
+                    <Button 
+                        variant="outline" 
+                        onClick={handleDownloadTemplate} 
+                        className="shrink-0 w-full sm:w-auto"
+                    >
+                        <FileText className="mr-2 h-4 w-4" />
+                        Unduh Template
+                    </Button>
+                </div>
+                <Input 
+                    id="excel-upload"
+                    type="file" 
+                    accept=".xlsx, .xls" 
+                    onChange={handleFileUpload} 
+                    disabled={isLoading}
+                    className="flex-1"
+                />
+            </TabsContent>
+            
+            <TabsContent value="manual" className="mt-4">
+                <ManualInputForm onAddEmployee={handleAddManualEmployee} />
+            </TabsContent>
+          </Tabs>
           
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <Input 
-              id="excel-upload"
-              type="file" 
-              accept=".xlsx, .xls" 
-              onChange={handleFileUpload} 
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button 
-              onClick={handleGeneratePDF} 
-              disabled={isLoading || selectedIds.size === 0}
-              className="w-full sm:w-auto"
-            >
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="mr-2 h-4 w-4" />
-              )}
-              Cetak {selectedIds.size} Karyawan ({totalSelectedCoupons} Kupon)
-            </Button>
-          </div>
+          <Button 
+            onClick={handleGeneratePDF} 
+            disabled={isLoading || selectedIds.size === 0}
+            className="w-full"
+          >
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            Cetak {selectedIds.size} Karyawan ({totalSelectedCoupons} Kupon)
+          </Button>
 
           {/* Bagian Pemilihan Karyawan (Inline) */}
           {employees.length > 0 && (
