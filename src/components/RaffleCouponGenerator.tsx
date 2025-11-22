@@ -219,7 +219,7 @@ const RaffleCouponGenerator: React.FC = () => {
         });
 
         setExcelData(parsedData);
-        showSuccess(`Berhasil memproses ${parsedData.length} karyawan dari Excel.`);
+        showSuccess(`Berhasil memproses ${parsedData.length} data dari Excel.`);
         
       } catch (error) {
         console.error(error);
@@ -245,12 +245,12 @@ const RaffleCouponGenerator: React.FC = () => {
       ...prev,
       { name, employeeId, masaKerja }
     ]);
-    showSuccess(`Karyawan ${name} berhasil ditambahkan.`);
+    showSuccess(`Data ${name} berhasil ditambahkan.`);
   };
 
   const handleDeleteSelected = useCallback(() => {
     if (selectedIds.size === 0) {
-      showError("Pilih setidaknya satu karyawan untuk dihapus.");
+      showError("Pilih setidaknya satu data untuk dihapus.");
       return;
     }
 
@@ -268,9 +268,9 @@ const RaffleCouponGenerator: React.FC = () => {
       setExcelData(newExcelData);
       setManualData(newManualData);
       setSelectedIds(new Set()); // Clear selection after deletion
-      showSuccess(`${deletedCount} karyawan berhasil dihapus.`);
+      showSuccess(`${deletedCount} data berhasil dihapus.`);
     } else {
-      showError("Tidak ada karyawan yang cocok dengan pilihan untuk dihapus.");
+      showError("Tidak ada data yang cocok dengan pilihan untuk dihapus.");
     }
   }, [selectedIds, excelData, manualData]);
 
@@ -279,7 +279,7 @@ const RaffleCouponGenerator: React.FC = () => {
     const selectedEmployeeIds = Array.from(selectedIds);
 
     if (selectedEmployeeIds.length === 0 || !couponContainerRef.current) {
-      showError("Tidak ada karyawan yang dipilih untuk dibuatkan kupon.");
+      showError("Tidak ada data yang dipilih untuk dibuatkan kupon.");
       return;
     }
 
@@ -386,7 +386,7 @@ const RaffleCouponGenerator: React.FC = () => {
       currentCouponIndexOnPage++;
     }
 
-    doc.save(`kupon_undian_${selectedEmployeeIds.length}_karyawan.pdf`);
+    doc.save(`kupon_undian_${selectedEmployeeIds.length}_data.pdf`);
     showSuccess(`Berhasil membuat PDF dengan ${pageCounter} halaman untuk ${couponsToPrint.length} kupon.`);
     
     // Clear temporary coupons and loading state
@@ -533,14 +533,14 @@ const RaffleCouponGenerator: React.FC = () => {
             ) : (
               <Download className="mr-2 h-4 w-4" />
             )}
-            Cetak {selectedIds.size} Karyawan ({totalSelectedCoupons} Kupon)
+            Cetak {selectedIds.size} Data ({totalSelectedCoupons} Kupon)
           </Button>
 
           {/* Bagian Pemilihan Karyawan (Inline) */}
           {employees.length > 0 && (
             <div className="space-y-4 p-4 border rounded-lg bg-card">
                 <div className="flex justify-between items-center">
-                    <h3 className="font-bold text-lg">Pilih Karyawan ({employees.length} Total)</h3>
+                    <h3 className="font-bold text-lg">Pilih Data ({employees.length} Total)</h3>
                     <Button 
                         variant="destructive" 
                         size="sm" 
@@ -556,7 +556,7 @@ const RaffleCouponGenerator: React.FC = () => {
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                    placeholder="Cari nama atau ID karyawan..."
+                    placeholder="Cari nama atau ID data..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -578,7 +578,7 @@ const RaffleCouponGenerator: React.FC = () => {
                     htmlFor="select-all"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1"
                     >
-                    Pilih Semua ({selectedIds.size} Karyawan Terpilih)
+                    Pilih Semua ({selectedIds.size} Data Terpilih)
                     </label>
                     <span className="text-sm w-20 text-right font-medium">Kupon</span>
                 </div>
@@ -587,7 +587,7 @@ const RaffleCouponGenerator: React.FC = () => {
                 <ScrollArea className="h-[300px] w-full rounded-md border">
                     <div className="p-2">
                     {filteredEmployees.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-4">Tidak ada karyawan yang cocok dengan pencarian.</p>
+                        <p className="text-center text-muted-foreground py-4">Tidak ada data yang cocok dengan pencarian.</p>
                     ) : (
                         filteredEmployees.map((employee) => (
                         <div key={employee.id} className="flex items-center space-x-2 py-2 border-b last:border-b-0">
@@ -627,7 +627,7 @@ const RaffleCouponGenerator: React.FC = () => {
                           watermarkText={customWatermarkText}
                       />
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">Total {coupons.length} kupon dari {employees.length} karyawan telah diproses.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Total {coupons.length} kupon dari {employees.length} data telah diproses.</p>
               </div>
           )}
         </CardContent>

@@ -34,7 +34,7 @@ const ManualInputForm: React.FC<ManualInputFormProps> = ({ onAddEmployee }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg bg-muted/50">
-      <h4 className="font-semibold text-lg">Input Karyawan Manual</h4>
+      <h4 className="font-semibold text-lg">Input Data Manual</h4>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label htmlFor="manual-name">Nama</Label>
@@ -68,7 +68,7 @@ const ManualInputForm: React.FC<ManualInputFormProps> = ({ onAddEmployee }) => {
       </div>
       <Button type="submit" className="w-full">
         <PlusCircle className="mr-2 h-4 w-4" />
-        Tambahkan Karyawan
+        Tambahkan Data
       </Button>
     </form>
   );
