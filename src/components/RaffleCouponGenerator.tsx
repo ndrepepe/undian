@@ -13,6 +13,8 @@ import { Loader2, Download, Search, FileText, FileSpreadsheet, PlusCircle, Trash
 import { showSuccess, showError } from '@/utils/toast';
 import CouponTemplate from './CouponTemplate';
 import ManualInputForm from './ManualInputForm';
+import PrizeListManager from './PrizeListManager';
+import RaffleDrawSimulator from './RaffleDrawSimulator';
 
 interface Coupon {
   name: string;
@@ -32,8 +34,17 @@ interface Employee {
   totalCoupons: number;
 }
 
+interface Prize {
+  id: string;
+  name: string;
+  quantity: number;
+  remaining: number;
+}
+
 // Kunci untuk localStorage
 const EVENT_DETAILS_KEY = 'raffle_event_details';
+const PRIZE_LIST_KEY = 'raffle_prize_list';
+const WINNING_EMPLOYEES_KEY = 'raffle_winning_employees';
 
 const RaffleCouponGenerator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +59,11 @@ const RaffleCouponGenerator: React.FC = () => {
   const [eventName, setEventName] = useState('');
   const [eventLocation, setEventLocation] = useState('');
   const [eventDate, setEventDate] = useState('');
-  const [customWatermarkText, setCustomWatermarkText] = useState(''); // Default Watermark diubah menjadi string kosong
+  const [customWatermarkText, setCustomWatermarkText] = useState(''); 
+
+  // State baru untuk Hadiah dan Pemenang
+  const [prizes, setPrizes] = useState<Prize[]>([]);
+  const [winningEmployeeIds, setWinningEmployeeIds] = useState<Set<string>>(new Set());
 
   const couponContainerRef = useRef<HTMLDivElement>(null);
 
@@ -524,6 +539,24 @@ const RaffleCouponGenerator: React.FC = () => {
             </TabsContent>
           </Tabs>
           
+          {/* Prize Management Section */}
+          <PrizeListManager 
+            prizes={prizes} 
+            setPrizes={setPrizes} 
+            PRIZE_LIST_KEY={PRIZE_LIST_KEY} 
+          />
+
+          {/* Raffle Draw Section */}
+          <RaffleDrawSimulator
+            employees={employees}
+            prizes={prizes}
+            setPrizes={setPrizes}
+            winningEmployeeIds={winningEmployeeIds}
+            setWinningEmployeeIds={setWinningEmployeeIds}
+            PRIZE_LIST_KEY={PRIZE_LIST_KEY}
+            WINNING_EMPLOYEES_KEY={WINNING_EMPLOYEES_KEY}
+          />
+
           <Button 
             onClick={handleGeneratePDF} 
             disabled={isLoading || selectedIds.size === 0}
